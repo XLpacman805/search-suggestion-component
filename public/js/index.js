@@ -1,1 +1,1 @@
-import './components/SearchBar/SearchBar.js';
+import './App.js';
