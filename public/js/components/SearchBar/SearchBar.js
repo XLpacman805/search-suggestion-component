@@ -3,6 +3,7 @@ class SearchBar extends HTMLElement {
         super();
         this.suggestions = [];
         this.addEventListener('input', this.handleInput);
+        this.addEventListener('click', this.handleListItemClick);
         this.value = "";
     }
 
@@ -55,6 +56,10 @@ class SearchBar extends HTMLElement {
     handleInput(event) {
         console.log(event.target.value);
         this.value = event.target.value;
+    }
+
+    handleListItemClick(event) {
+        this.setValue(event.target.innerText);
     }
 
     createUL() {
