@@ -3,8 +3,11 @@ class SearchBar extends HTMLElement {
         super();
         this.suggestions = [];
         this.addEventListener('input', this.handleInput);
-        this.addEventListener('click', this.handleListItemClick);
-        this.value = "";
+        this.addEventListener('click', (event) => event.target.nodeName === "LI" ? this.handleListItemClick(event) : null);
+        this.inputValue = '';
+        this.divNode = document.createElement('div');
+        this.inputNode = document.createElement('input');
+        this.ulNode = this.createULNode();
     }
 
     connectedCallback() {
@@ -27,7 +30,7 @@ class SearchBar extends HTMLElement {
     setSuggestions(suggestions) {
         if (Array.isArray(suggestions) && suggestions.every(element => typeof(element) === "string")) {
             this.suggestions = suggestions;
-            this.render();
+            this.ulNode = this.createULNode();
         } else {
             throw new TypeError('Suggestions needs to be an array of strings.');
         }
@@ -37,17 +40,16 @@ class SearchBar extends HTMLElement {
      * Get the current value.
      * @returns string
      */
-    getValue() {
-        return this.value;
+    getInputValue() {
+        return this.inputValue;
     }
     /**
      * Set value of search bar.
      * @param {string} text - The text you wish to be set and rendered to the search bar.
      */
-    setValue(text) {
+    setInputValue(text) {
         if (typeof(text) === 'string') {
-            this.value = text;
-            this.render();
+            this.inputValue = text;
         } else {
             throw new TypeError('Value must be a string');
         }
@@ -55,30 +57,44 @@ class SearchBar extends HTMLElement {
 
     handleInput(event) {
         console.log(event.target.value);
-        this.value = event.target.value;
+        this.setInputValue(event.target.value);
     }
 
     handleListItemClick(event) {
-        this.setValue(event.target.innerText);
+        this.setInputValue(event.target.innerText);
+        this.render();
     }
 
-    createUL() {
-        return `
-            <ul>
-                ${this.suggestions.map(suggestion => '<li>' + suggestion + '</li>').join('')}
-            </ul>
-        `;
+    createInputNode() {
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.value = this.getInputValue();
+        return input;
+    }
+
+    createULNode() {
+        let ul = document.createElement('ul');
+        console.log(this.getSuggestions());
+        for (const suggestion of this.getSuggestions()) {
+            let li = document.createElement('li');
+            li.appendChild(document.createTextNode(suggestion));
+            ul.appendChild(li);
+        }
+        return ul;
     }
 
     render() {
-        // Create input field
-        // Create dropdown suggestions
-        this.innerHTML = `
-            <form>
-                <input type="text" value=${this.value}>
-                ${this.createUL()}
-            </form>
-        `;
+        let newDiv = document.createElement('div');
+        newDiv.appendChild(this.createInputNode());
+        newDiv.appendChild(this.createULNode());
+
+        if (this.hasChildNodes()) {
+            const oldDiv = this.childNodes[0];
+            oldDiv.replaceWith(newDiv);
+
+        } else {
+           this.appendChild(newDiv);
+        }
     }
 }
 customElements.define('jm-search-bar', SearchBar);
