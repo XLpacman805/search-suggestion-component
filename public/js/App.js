@@ -2,6 +2,7 @@ import { SuggestionService } from './services/SuggestionService.js';
 const suggestionSearchBar = document.getElementById('search-suggestion-bar');
 const suggestionSearchBarList = suggestionSearchBar.children[1];
 const suggestionSearchBarInput = suggestionSearchBar.children[0];
+
 const createListItemsHTML = (collection) => {
     if (Array.isArray(collection) && collection.every(element => typeof(element) === 'string')) {
         return collection.map(text => `<li> ${text} </li>`).join('');
@@ -23,9 +24,10 @@ const handleInput = (event) => {
 }
 
 const handleClick = (event) => {
-    // Set the input value to the click results.
+    if (event.target.tagName === 'LI') {
+        suggestionSearchBarInput.value = event.target.innerText;
+    }
 }
 
-
 suggestionSearchBar.addEventListener('input', handleInput);
-suggestionSearchBar.addEventListener('click', (event) => console.log(event));
+suggestionSearchBar.addEventListener('click', handleClick);
