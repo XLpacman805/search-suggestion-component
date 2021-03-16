@@ -1,4 +1,5 @@
 import { SuggestionService } from './services/SuggestionService.js';
+import { Throttle } from './utility/throttle.js';
 const suggestionSearchBar = document.getElementById('search-suggestion-bar');
 const suggestionSearchBarList = suggestionSearchBar.children[1];
 const suggestionSearchBarInput = suggestionSearchBar.children[0];
@@ -11,7 +12,6 @@ const createListItemsHTML = (collection) => {
 }
 
 const handleInput = (event) => {
-    // query suggestion service (throttle it somehow)
     if (event.target.value) {
         SuggestionService(event.target.value)
             .then(data => {
@@ -29,5 +29,5 @@ const handleClick = (event) => {
     }
 }
 
-suggestionSearchBar.addEventListener('input', handleInput);
+suggestionSearchBar.addEventListener('input', Throttle(handleInput, 300));
 suggestionSearchBar.addEventListener('click', handleClick);
